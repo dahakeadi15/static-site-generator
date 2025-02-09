@@ -14,34 +14,71 @@ class TestHTMLNode(unittest.TestCase):
             node.props_to_html(), ' href="https://boot.dev" target="_blank"'
         )
 
-    def test_props_to_html_false(self):
-        node = HTMLNode(props={"href": "https://boot.dev", "target": "_blank"})
-        self.assertNotEqual(
-            node.props_to_html(), 'href="https://boot.dev" target="_blank"'
-        )
-
     def test_repr_all(self):
         node = HTMLNode(
             "a",
             "anchor text",
-            [HTMLNode("span", "child"), HTMLNode("b", "bold child")],
+            [HTMLNode("span", "child")],
             {"href": "http://boot.dev", "target": "_blank"},
         )
         self.assertEqual(
-            "HTMLNode(tag: <a></a>, value: anchor text, number_of_children: 2 HTMLNode(s), props: {'href': 'http://boot.dev', 'target': '_blank'})",
+            "HTMLNode(a, anchor text, children: [HTMLNode(span, child, children: None, props: None)], props: {'href': 'http://boot.dev', 'target': '_blank'})",
             repr(node),
         )
 
     def test_repr_none(self):
         node = HTMLNode()
         self.assertEqual(
-            "HTMLNode(tag: None, value: None, number_of_children: No HTMLNode(s), props: None)",
+            "HTMLNode(None, None, children: None, props: None)",
             repr(node),
         )
 
-    def test_false_repr(self):
-        node = HTMLNode()
-        self.assertNotEqual("HTMLNode()", repr(node))
+    # Lane's version
+    def test_to_html_props(self):
+        node = HTMLNode(
+            "div",
+            "Hello, world!",
+            None,
+            {"class": "greeting", "href": "https://boot.dev"},
+        )
+        self.assertEqual(
+            node.props_to_html(),
+            ' class="greeting" href="https://boot.dev"',
+        )
+
+    def test_values(self):
+        node = HTMLNode(
+            "div",
+            "I wish I could read",
+        )
+        self.assertEqual(
+            node.tag,
+            "div",
+        )
+        self.assertEqual(
+            node.value,
+            "I wish I could read",
+        )
+        self.assertEqual(
+            node.children,
+            None,
+        )
+        self.assertEqual(
+            node.props,
+            None,
+        )
+
+    def test_repr(self):
+        node = HTMLNode(
+            "p",
+            "What a strange world",
+            None,
+            {"class": "primary"},
+        )
+        self.assertEqual(
+            node.__repr__(),
+            "HTMLNode(p, What a strange world, children: None, props: {'class': 'primary'})",
+        )
 
 
 if __name__ == "__main__":
