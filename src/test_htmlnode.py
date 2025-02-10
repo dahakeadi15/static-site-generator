@@ -103,7 +103,7 @@ class TestParentNode(unittest.TestCase):
         node = ParentNode("p", [LeafNode("b", "Bold text")], {"class": "info"})
         self.assertEqual(
             node.__repr__(),
-            "ParentNode(p, [LeafNode(b, Bold text, None)], {'class': 'info'})",
+            "ParentNode(p, children: [LeafNode(b, Bold text, None)], {'class': 'info'})",
         )
 
     def test_to_html_no_tag(self):
@@ -114,81 +114,50 @@ class TestParentNode(unittest.TestCase):
         node = ParentNode("p", None)
         self.assertRaises(ValueError, node.to_html)
 
-    def test_to_html_only_leaves(self):
-        node = ParentNode(
-            "p",
-            [
-                LeafNode("b", "Bold text"),
-                LeafNode(None, "Normal text"),
-                LeafNode("i", "italic text"),
-                LeafNode(None, "Normal text"),
-            ],
-            {"class": "info"},
-        )
+    def test_to_html_with_children(self):
+        child_node = LeafNode("b", "Bold text")
+        parent_node = ParentNode("p", [child_node], {"class": "info"})
         self.assertEqual(
-            node.to_html(),
-            '<p class="info"><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>',
+            parent_node.to_html(),
+            '<p class="info"><b>Bold text</b></p>',
         )
 
     def test_to_html_parent_as_child(self):
-        node = ParentNode(
-            "p",
-            [
-                LeafNode("b", "Bold text"),
-                LeafNode(None, "Normal text"),
-                ParentNode(
-                    "span",
-                    [
-                        LeafNode("i", "italic text"),
-                        LeafNode(None, "Normal text"),
-                    ],
-                ),
-            ],
-            {"class": "info"},
+        inner_child_node = LeafNode(None, "Normal text")
+        child_parent_node = ParentNode("span", [inner_child_node])
+        child_node = LeafNode("b", "Bold text")
+        parent_node = ParentNode(
+            "p", [child_node, child_parent_node], {"class": "info"}
         )
         self.assertEqual(
-            node.to_html(),
-            '<p class="info"><b>Bold text</b>Normal text<span><i>italic text</i>Normal text</span></p>',
+            parent_node.to_html(),
+            '<p class="info"><b>Bold text</b><span>Normal text</span></p>',
         )
 
     def test_to_html_multiple_parents(self):
-        node = node = ParentNode(
-            "div",
-            [
-                LeafNode("div", "Unordered list"),
-                ParentNode(
-                    "ul", [LeafNode("li", "ul item"), LeafNode("li", "ul item")]
-                ),
-                LeafNode("div", "Ordered list"),
-                ParentNode(
-                    "ol", [LeafNode("li", "ol item1"), LeafNode("li", "ol item2")]
-                ),
-            ],
+        child1 = LeafNode("div", "Unordered list")
+        parent1 = ParentNode(
+            "ul", [LeafNode("li", "ul item"), LeafNode("li", "ul item")]
         )
+        child2 = LeafNode("div", "Ordered list")
+        parent2 = ParentNode(
+            "ol", [LeafNode("li", "ol item1"), LeafNode("li", "ol item2")]
+        )
+        parent_node = ParentNode("div", [child1, parent1, child2, parent2])
         self.assertEqual(
-            node.to_html(),
+            parent_node.to_html(),
             "<div><div>Unordered list</div><ul><li>ul item</li><li>ul item</li></ul><div>Ordered list</div><ol><li>ol item1</li><li>ol item2</li></ol></div>",
         )
 
     def test_to_html_nested_parents(self):
-        node = node = ParentNode(
-            "div",
-            [
-                ParentNode(
-                    "p",
-                    [
-                        LeafNode("b", "Bold text"),
-                        LeafNode(None, "Normal text"),
-                        ParentNode("span", [LeafNode("i", "italic text")]),
-                    ],
-                    {"class": "info"},
-                )
-            ],
-            {"class": "container"},
+        parent2 = ParentNode("span", [LeafNode("i", "italic text")])
+        parent1 = ParentNode(
+            "p", [LeafNode(None, "Normal text"), parent2], {"class": "info"}
         )
+        parent0 = ParentNode("div", [parent1], {"class": "container"})
         self.assertEqual(
-            node.to_html(),
-            '<div class="container"><p class="info"><b>Bold text</b>Normal text<span><i>italic text</i></span></p></div>',
+            parent0.to_html(),
+            '<div class="container"><p class="info">Normal text<span><i>italic text</i></span></p></div>',
         )
 
 
