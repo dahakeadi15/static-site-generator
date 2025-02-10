@@ -82,17 +82,20 @@ class TestHTMLNode(unittest.TestCase):
 
 
 class TestLeafNode(unittest.TestCase):
-    def test_init(self):
-        node = LeafNode(value="value", tag="div", props={"class": "property"})
-        self.assertIsInstance(node, HTMLNode)
-
     def test_to_html_with_tag(self):
-        node = LeafNode(value="value", tag="div", props={"class": "property"})
-        self.assertEqual(node.to_html(), '<div class="property">value</div>')
+        node = LeafNode("h1", "Hello World!", props={"class": "hello"})
+        self.assertEqual(node.to_html(), '<h1 class="hello">Hello World!</h1>')
 
     def test_to_html_without_tag(self):
-        node = LeafNode(value="value")
+        node = LeafNode(None, "value")
         self.assertEqual(node.to_html(), "value")
+
+    def test_repr(self):
+        node = LeafNode("p", "What a strange world", {"class": "primary"})
+        self.assertEqual(
+            node.__repr__(),
+            "LeafNode(p, What a strange world, {'class': 'primary'})",
+        )
 
 
 if __name__ == "__main__":
