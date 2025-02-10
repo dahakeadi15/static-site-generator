@@ -1,6 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode
+from htmlnode import HTMLNode, LeafNode
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -79,6 +79,20 @@ class TestHTMLNode(unittest.TestCase):
             node.__repr__(),
             "HTMLNode(p, What a strange world, children: None, props: {'class': 'primary'})",
         )
+
+
+class TestLeafNode(unittest.TestCase):
+    def test_init(self):
+        node = LeafNode(value="value", tag="div", props={"class": "property"})
+        self.assertIsInstance(node, HTMLNode)
+
+    def test_to_html_with_tag(self):
+        node = LeafNode(value="value", tag="div", props={"class": "property"})
+        self.assertEqual(node.to_html(), '<div class="property">value</div>')
+
+    def test_to_html_without_tag(self):
+        node = LeafNode(value="value")
+        self.assertEqual(node.to_html(), "value")
 
 
 if __name__ == "__main__":
