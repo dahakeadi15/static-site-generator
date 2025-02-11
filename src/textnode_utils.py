@@ -43,7 +43,7 @@ def extract_markdown_links(text):
     return links
 
 
-def split_nodes_image(old_nodes: list[TextNode]):
+def split_nodes_image(old_nodes):
     new_nodes = []
     for old_node in old_nodes:
         if old_node.text_type != TextType.TEXT:
@@ -76,7 +76,7 @@ def split_nodes_image(old_nodes: list[TextNode]):
     return new_nodes
 
 
-def split_nodes_link(old_nodes: list[TextNode]):
+def split_nodes_link(old_nodes):
     new_nodes = []
     for old_node in old_nodes:
         if old_node.text_type != TextType.TEXT:
@@ -107,3 +107,35 @@ def split_nodes_link(old_nodes: list[TextNode]):
         new_nodes.extend(split_nodes)
 
     return new_nodes
+
+
+def text_to_textnodes(text):
+    textnodes = [TextNode(text, TextType.TEXT)]
+
+    # BOLD
+    textnodes = split_nodes_delimiter(textnodes, "**", TextType.BOLD)
+    # ITALIC
+    textnodes = split_nodes_delimiter(textnodes, "*", TextType.ITALIC)
+    # CODE
+    textnodes = split_nodes_delimiter(textnodes, "`", TextType.CODE)
+    # IMAGES
+    textnodes = split_nodes_image(textnodes)
+    # LINKS
+    textnodes = split_nodes_link(textnodes)
+
+    return textnodes
+
+
+# "This is **text** with an *italic* word and a `code block` and an ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+# [
+#     TextNode("This is ", TextType.TEXT),
+#     TextNode("text", TextType.BOLD),
+#     TextNode(" with an ", TextType.TEXT),
+#     TextNode("italic", TextType.ITALIC),
+#     TextNode(" word and a ", TextType.TEXT),
+#     TextNode("code block", TextType.CODE),
+#     TextNode(" and an ", TextType.TEXT),
+#     TextNode("obi wan", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+#     TextNode(" and a ", TextType.TEXT),
+#     TextNode("link", TextType.LINK, "https://boot.dev"),
+# ]
