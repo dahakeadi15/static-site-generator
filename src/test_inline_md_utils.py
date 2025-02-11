@@ -1,7 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType
-from textnode_utils import (
+from inline_md_utils import (
     extract_markdown_images,
     extract_markdown_links,
     split_nodes_delimiter,
@@ -9,6 +8,7 @@ from textnode_utils import (
     split_nodes_link,
     text_to_textnodes,
 )
+from textnode import TextNode, TextType
 
 
 class TestSplitNodesDelimiter(unittest.TestCase):
