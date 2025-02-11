@@ -9,23 +9,14 @@ def markdown_to_blocks(md_document):
 
 
 def block_to_block_type(block: str):
-    # Heading
-    if (
-        block.startswith("# ")
-        or block.startswith("## ")
-        or block.startswith("### ")
-        or block.startswith("#### ")
-        or block.startswith("##### ")
-        or block.startswith("###### ")
-    ):
-        return "heading"
-
     lines = block.split("\n")
 
+    # Heading
+    if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
+        return "heading"
+
     # Code
-    first_line = lines[0]
-    last_line = lines[-1]
-    if first_line.startswith("```") and last_line.startswith("```"):
+    if len(lines) > 1 and lines[0].startswith("```") and lines[-1].startswith("```"):
         return "code"
 
     # Quote
@@ -52,17 +43,12 @@ def block_to_block_type(block: str):
 
     # Ordered List
     is_ul = True
-    prev = 0
+    i = 1
     for line in lines:
-        index = line.split(" ", maxsplit=1)[0]
-        if index[-1] != ".":
+        if not line.startswith(f"{i}."):
             is_ul = False
             break
-        curr = int(index[:-1])
-        if curr - 1 != prev:
-            is_ul = False
-            break
-        prev = curr
+        i += 1
 
     if is_ul:
         return "ordered_list"
