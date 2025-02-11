@@ -61,7 +61,8 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         )
 
 
-class Test(unittest.TestCase):
+class TestExtractingImagesAndLinks(unittest.TestCase):
+    # IMAGES
     def test_extract_images(self):
         text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
         extracted_images = extract_markdown_images(text)
@@ -87,6 +88,15 @@ class Test(unittest.TestCase):
             extracted_images, [("rick roll", "https://i.imgur.com/aKaOqIh.gif")]
         )
 
+    def test_extract_images_not_links(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and an image ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        extracted_images = extract_markdown_images(text)
+        self.assertEqual(
+            extracted_images, [("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
+        )
+
+    # LINKS
+
     def test_extract_links(self):
         text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
         extracted_links = extract_markdown_links(text)
@@ -105,6 +115,11 @@ class Test(unittest.TestCase):
 
     def test_extract_links_with_extra_parenthesis(self):
         text = "This is text with (just some bracketed text), a link [to boot dev](https://www.boot.dev) and (some more)."
+        extracted_links = extract_markdown_links(text)
+        self.assertEqual(extracted_links, [("to boot dev", "https://www.boot.dev")])
+
+    def test_extract_links_not_images(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and an image ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
         extracted_links = extract_markdown_links(text)
         self.assertEqual(extracted_links, [("to boot dev", "https://www.boot.dev")])
 
