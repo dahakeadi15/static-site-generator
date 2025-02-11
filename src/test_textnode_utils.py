@@ -1,7 +1,11 @@
 import unittest
 
 from textnode import TextNode, TextType
-from textnode_utils import split_nodes_delimiter
+from textnode_utils import (
+    extract_markdown_images,
+    extract_markdown_links,
+    split_nodes_delimiter,
+)
 
 
 class TestSplitNodesDelimiter(unittest.TestCase):
@@ -55,6 +59,54 @@ class TestSplitNodesDelimiter(unittest.TestCase):
                 ]
             ),
         )
+
+
+class Test(unittest.TestCase):
+    def test_extract_images(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        extracted_images = extract_markdown_images(text)
+        self.assertEqual(
+            extracted_images,
+            [
+                ("rick roll", "https://i.imgur.com/aKaOqIh.gif"),
+                ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg"),
+            ],
+        )
+
+    def test_extract_images_with_extra_bracket(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and [some text in brackets]"
+        extracted_images = extract_markdown_images(text)
+        self.assertEqual(
+            extracted_images, [("rick roll", "https://i.imgur.com/aKaOqIh.gif")]
+        )
+
+    def test_extract_images_with_extra_parenthesis(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and (some text in brackets)"
+        extracted_images = extract_markdown_images(text)
+        self.assertEqual(
+            extracted_images, [("rick roll", "https://i.imgur.com/aKaOqIh.gif")]
+        )
+
+    def test_extract_links(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        extracted_links = extract_markdown_links(text)
+        self.assertEqual(
+            extracted_links,
+            [
+                ("to boot dev", "https://www.boot.dev"),
+                ("to youtube", "https://www.youtube.com/@bootdotdev"),
+            ],
+        )
+
+    def test_extract_links_with_extra_bracket(self):
+        text = "This is text with [just some bracketed text], a link [to boot dev](https://www.boot.dev) and [some more]."
+        extracted_links = extract_markdown_links(text)
+        self.assertEqual(extracted_links, [("to boot dev", "https://www.boot.dev")])
+
+    def test_extract_links_with_extra_parenthesis(self):
+        text = "This is text with (just some bracketed text), a link [to boot dev](https://www.boot.dev) and (some more)."
+        extracted_links = extract_markdown_links(text)
+        self.assertEqual(extracted_links, [("to boot dev", "https://www.boot.dev")])
 
 
 class TestInlineMarkdown(unittest.TestCase):
