@@ -1,6 +1,6 @@
 import os
 
-from md_to_html import extract_title, markdown_to_html_node
+from md_to_html import markdown_to_html_node
 
 
 def generate_page(from_path, template_path, dest_path):
@@ -17,17 +17,26 @@ def generate_page(from_path, template_path, dest_path):
     html_string = markdown_to_html_node(md_content).to_html()
     page_title = extract_title(md_content)
 
-    html_content = template.replace("{{ Title }}", page_title)
-    html_content = html_content.replace("{{ Content }}", html_string)
+    page_html = template.replace("{{ Title }}", page_title)
+    page_html = page_html.replace("{{ Content }}", html_string)
 
     dest_dirname = os.path.dirname(dest_path)
     if not os.path.exists(dest_dirname):
         os.makedirs(dest_dirname)
 
     with open(dest_path, "w") as html_file:
-        html_file.write(html_content)
+        html_file.write(page_html)
 
     print("...generated")
 
 
-# Write the new full HTML page to a file at dest_path. Be sure to create any necessary directories if they don’t exist.
+def extract_title(markdown):
+    title = ""
+    lines = markdown.split("\n")
+    for line in lines:
+        if line.startswith("# "):
+            title = line.lstrip("#").strip()
+            break
+    if title == "":
+        raise ValueError("Title not found!")
+    return title

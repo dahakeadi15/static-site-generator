@@ -69,14 +69,3 @@ def text_to_children(text):
     for text_node in text_nodes:
         children.append(text_node_to_html_node(text_node))
     return children
-
-
-def extract_title(markdown):
-    title = ""
-    lines = markdown.split("\n")
-    for line in lines:
-        if line.startswith("# "):
-            title = line.lstrip("#").strip()
-    if title == "":
-        raise ValueError("Title not found!")
-    return title
