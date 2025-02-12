@@ -1,7 +1,7 @@
 import unittest
 
 from htmlnode import ParentNode
-from md_to_html import markdown_to_html_node
+from md_to_html import extract_title, markdown_to_html_node
 
 
 class TestMdToHTML(unittest.TestCase):
@@ -140,3 +140,40 @@ this is paragraph text
             html,
             "<div><blockquote>This is a blockquote block</blockquote><p>this is paragraph text</p></div>",
         )
+
+
+class TestExtractTitle(unittest.TestCase):
+    def test_extract_title_error(self):
+        markdown = ""
+        self.assertRaises(ValueError, lambda: extract_title(markdown))
+
+    def test_extract_title(self):
+        markdown = """
+# Tolkien Fan Club
+
+**I like Tolkien**. Read my [first post here](/majesty) (sorry the link doesn't work yet)
+
+> All that is gold does not glitter
+
+## Reasons I like Tolkien
+
+* You can spend years studying the legendarium and still not understand its depths
+* It can be enjoyed by children and adults alike
+"""
+        title = extract_title(markdown)
+        self.assertEqual(title, "Tolkien Fan Club")
+
+    def test_extract_title_2(self):
+        markdown = """
+
+**I like Tolkien**. Read my [first post here](/majesty) (sorry the link doesn't work yet)
+
+# Tolkien Fan Club
+
+"""
+        title = extract_title(markdown)
+        self.assertEqual(title, "Tolkien Fan Club")
+
+
+if __name__ == "__main__":
+    unittest.main()
