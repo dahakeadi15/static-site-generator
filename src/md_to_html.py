@@ -1,7 +1,7 @@
 from block_md_utils import block_to_block_type, markdown_to_blocks
 from htmlnode import LeafNode, ParentNode
 from inline_md_utils import text_to_textnodes
-from textnode import TextNode, text_node_to_html_node
+from textnode import text_node_to_html_node
 
 
 def markdown_to_html_node(markdown):
@@ -9,13 +9,13 @@ def markdown_to_html_node(markdown):
     root_node = ParentNode("div", [])
 
     for block in blocks:
-        block_node = md_block_to_html_block(block)
+        block_node = block_to_html_node(block)
         root_node.children.append(block_node)
 
     return root_node
 
 
-def md_block_to_html_block(block):
+def block_to_html_node(block):
     block_type = block_to_block_type(block)
     block_lines = block.split("\n")
     children = None
@@ -23,52 +23,49 @@ def md_block_to_html_block(block):
     match block_type:
         case "heading":
             level, heading = block.split(" ", maxsplit=1)
+            if len(level) > 6:
+                raise ValueError(f"invalid heading level: {level}")
             tag = f"h{len(level)}"
-            block_lines = [heading]
-            children = block_text_to_children_nodes(block_lines)
+            children = text_to_children(heading)
         case "paragraph":
             tag = "p"
-            children = block_text_to_children_nodes(block_lines)
+            text = " ".join(block_lines)
+            children = text_to_children(text)
         case "code":
             tag = "pre"
             children = [LeafNode("code", "\n".join(block_lines[1:-1]))]
         case "quote":
             tag = "blockquote"
-            block_lines = [line.split("> ", maxsplit=1)[1] for line in block_lines]
-            children = block_text_to_children_nodes(block_lines)
+            new_lines = []
+            for line in block_lines:
+                new_lines.append(line.lstrip(">").strip())
+            content = " ".join(new_lines)
+            children = text_to_children(content)
         case "unordered_list":
             tag = "ul"
-            lines = []
-            for line in block_lines:
-                if line.startswith("* "):
-                    lines.append(line.split("* ", maxsplit=1)[1])
-                elif line.startswith("- "):
-                    lines.append(line.split("- ", maxsplit=1)[1])
-                else:
-                    lines.append(line)
-            children = [
-                ParentNode("li", [b]) for b in block_text_to_children_nodes(lines)
-            ]
+            html_items = []
+            for item in block_lines:
+                text = item[2:]
+                item_children = text_to_children(text)
+                html_items.append(ParentNode("li", item_children))
+            children = html_items
         case "ordered_list":
             tag = "ol"
-            lines = []
-            i = 1
+            html_items = []
             for line in block_lines:
-                lines.append(line.split(f"{i}. ", maxsplit=1)[1])
-                i += 1
-            children = [
-                ParentNode("li", [b]) for b in block_text_to_children_nodes(lines)
-            ]
+                text = line.split(f" ", maxsplit=1)[1]
+                item_children = text_to_children(text)
+                html_items.append(ParentNode("li", item_children))
+            children = html_items
         case _:
             raise ValueError("invalid markdown: block not supported")
 
     return ParentNode(tag, children)
 
 
-def block_text_to_children_nodes(lines):
-    nodes = []
-    for line in lines:
-        text_nodes = text_to_textnodes(line)
-        for text_node in text_nodes:
-            nodes.append(text_node_to_html_node(text_node))
-    return nodes
+def text_to_children(text):
+    children = []
+    text_nodes = text_to_textnodes(text)
+    for text_node in text_nodes:
+        children.append(text_node_to_html_node(text_node))
+    return children
