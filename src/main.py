@@ -14,7 +14,9 @@ def main():
     copy_static_to_public(dir_path_static, dir_path_public, logging=True)
 
     # generate pages from content and place in public
+    print("Generating content...")
     generate_pages_recursive(dir_path_content, template_path, dir_path_public)
+    print("...finished generating content")
 
 
 if __name__ == "__main__":

@@ -4,11 +4,7 @@ from md_to_html import markdown_to_html_node
 
 
 def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
-    if not os.path.exists(dest_dir_path):
-        os.mkdir(dest_dir_path)
-
     dir_list = os.listdir(dir_path_content)
-
     for item in dir_list:
         src_path = os.path.join(dir_path_content, item)
         if os.path.isfile(src_path):
