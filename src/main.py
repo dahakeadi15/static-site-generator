@@ -1,7 +1,7 @@
 import os
 
 from copystatic import copy_static_to_public
-from generatepage import generate_page
+from generatepage import generate_pages_recursive
 
 dir_path_static = "./static"
 dir_path_public = "./public"
@@ -13,10 +13,8 @@ def main():
     # Delete public dir and create fresh, then copy static contents to it
     copy_static_to_public(dir_path_static, dir_path_public, logging=True)
 
-    # generate page from content and place in public
-    content_path = os.path.join(dir_path_content, "index.md")
-    public_path = os.path.join(dir_path_public, "index.html")
-    generate_page(content_path, template_path, public_path)
+    # generate pages from content and place in public
+    generate_pages_recursive(dir_path_content, template_path, dir_path_public)
 
 
 if __name__ == "__main__":

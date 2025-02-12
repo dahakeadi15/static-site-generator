@@ -3,6 +3,24 @@ import os
 from md_to_html import markdown_to_html_node
 
 
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    if not os.path.exists(dest_dir_path):
+        os.mkdir(dest_dir_path)
+
+    dir_list = os.listdir(dir_path_content)
+
+    for item in dir_list:
+        src_path = os.path.join(dir_path_content, item)
+        if os.path.isfile(src_path):
+            if item[-3:] == ".md":
+                dest_file_name = item[:-3]
+                dest_file_path = os.path.join(dest_dir_path, f"{dest_file_name}.html")
+                generate_page(src_path, template_path, dest_file_path)
+        else:
+            dest_path = os.path.join(dest_dir_path, item)
+            generate_pages_recursive(src_path, template_path, dest_path)
+
+
 def generate_page(from_path, template_path, dest_path):
     print(
         f"Generating page from `{from_path}` to `{dest_path}` using `{template_path}`..."
