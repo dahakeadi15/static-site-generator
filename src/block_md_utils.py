@@ -23,7 +23,7 @@ def block_to_block_type(block: str):
     is_quote = True
 
     for line in lines:
-        if not line.startswith("> "):
+        if not line.startswith(">"):
             is_quote = False
             break
 
